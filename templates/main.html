@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<style>
+form {
+    margin: auto;
+    width: 35%;
+}
+.result {
+    margin: auto;
+    width: 35%;
+    border: 1px solid #ccc;
+}
+</style>
+<head>
+    <title>Tourist Expenditure Model</title>
+</head>
+<form action="{{ url_for('main') }}" method="POST">
+    <fieldset>
+
+        <legend>Input values:</legend>
+        Date:
+        <input name="month-today" id="month-today" type="number" value="">
+        <br>
+
+        <select name="select_place" id="select_place">
+          <option value="Mombasa">Mombasa</option>
+          <option value="Narok">Narok</option>
+          <option value="Kajiado">Kajiado</option>
+          <option value="Nairobi">Nairobi</option>
+        </select>
+        Temperature:
+        <input name="temperature" type="number" id="temperature"  step="0.01" required>
+        <br>
+        <br> Humidity:
+        <input name="humidity" type="number" id="humidity"  step="0.01" required>
+        <br>
+        <script>
+            document.getElementById("month-today").value = new Date().getMonth();
+            const humidity = document.getElementById(('humidity'))
+            const temperature = document.getElementById('temperature');
+            const selectPlace = document.getElementById('select_place');
+
+            selectPlace.addEventListener('change', () => {
+                var place=document.getElementById('select_place').value;
+                checkWeather(place)
+            })
+            let currWeather;
+            const checkWeather = async (place, callback) => {
+                let weatherData  = await fetch(`https://api.weatherapi.com/v1/current.json?key=be14007191cf4192b20110252231002&q=${place}&aqi=no`)
+                let weatherDataJson = await weatherData.json();
+                currWeather = weatherDataJson;
+                humidity.value = weatherDataJson.current.humidity;
+                temperature.value = weatherDataJson.current.feelslike_c;
+                console.log(weatherDataJson.current)
+                return weatherDataJson;
+            }
+            console.log(currWeather)
+
+        </script>
+        <br>
+        <input type="submit">
+    </fieldset>
+</form>
+<br>
+<div class="result" align="center">
+    {% if result %}
+        {% for variable, value in original_input.items() %}
+            <b>{{ variable }}</b> : {{ value }}
+        {% endfor %}
+        <br>
+        <br> Predicted expenditure:
+           <p style="font-size:50px">{{ result }}</p>
+    {% endif %}
+    {% if places %}
+        <img src={{places.place_picture}} alt="place image" />
+        {{places.place_description}}
+    {% endif %}
+    <div>
+
+  <a href="{{ url_for('main') }}">Home</a>
+  {% if current_user.is_anonymous %}
+  <a href="{{ url_for('login') }}">Login</a>
+  {% else %}
+  <p>Welcome {{current_user.username}}</p>
+  <a href="{{ url_for('logout') }}">Logout</a>
+  {% endif %}
+
+</div>
+</div>
+</html>
