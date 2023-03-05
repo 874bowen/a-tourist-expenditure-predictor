@@ -1,52 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
-    <h1><a href="{{ url_for('register') }}">Create a new Account!</a></h1>
-<form action="" method="post">
-   {{ form.hidden_tag() }}
-   <div>
-      {{ form.email(placeholder="email",
-      style='width: 50%;
-      font-weight: bold;
-      padding: 12px 20px ;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box') }}
-      {% for error in form.email.errors %}
-      <p>{{ error }}</p>
-      {% endfor %}
-   </div>
-   <br>
-   <div>
-      {{ form.password(placeholder="password",
-      style='width: 50%;
-      font-weight: bold;
-      padding: 12px 20px ;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box') }}
-      {% for error in form.password.errors %}
-      <p>{{ error }}</p>
-      {% endfor %}
-   </div>
-   <p>{{ form.remember() }} {{ form.remember.label }}</p>
-   <p>{{ form.submit(style ='background-color: #4CAF50;
-      color: white;
-      width: 50%;
-      padding: 14px 20px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 4px') }}
-   </p>
-</form>
+    <div class="form-container">
+        <form action="" method="post" class="form-selector d-flex flex-column col-11 col-sm-8 col-md-6 p-5">
+           {{ form.hidden_tag() }}
+            <h1 class="text-light">Sign In</h1>
+            <br>
+           <div class="w-100">
+              {{ form.email(placeholder="email",
+              class="login--email") }}
+              {% for error in form.email.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+           </div>
+           <br>
+           <div class="w-100">
+              {{ form.password(placeholder="password",
+              class='password-input') }}
+              {% for error in form.password.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+           </div>
+           <p class="text-light">{{ form.remember() }} {{ form.remember.label }}</p>
+           <p>{{ form.submit(class ='submit-button') }}
+           </p>
+        <p class="text-light">Don't have an account? <a href="{{ url_for('register') }}">Create a new Account!</a></p>
+        </form>
+    </div>
 {% for message in get_flashed_messages() %}
 <p style="color: red;">Error : {{ message }}</p>
 {% endfor %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>
