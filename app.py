@@ -4,17 +4,15 @@ import pickle
 import pandas as pd
 from flask import redirect, url_for, render_template, flash, request, send_from_directory
 from flask_cors import CORS
-from datetime import datetime
-
 from flask_migrate import Migrate
 from sqlalchemy import desc
-from sqlalchemy.orm import backref
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from werkzeug.utils import secure_filename
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from forms import RegistrationForm, LoginForm, MemoryForm, photos
+from models import User, CountiesModel, PlacesModel, Memories, db
 
 SECRET_KEY = os.urandom(32)
 
@@ -56,71 +54,14 @@ app.config['UPLOADED_PHOTOS_DEST'] = 'uploads'
 configure_uploads(app, photos)
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 CORS(app)
 # configure Login Manager class in app
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
-class CountiesModel(db.Model):
-    __tablename__ = 'counties_table'
-
-    id = db.Column(db.Integer, primary_key=True)
-    county_name = db.Column(db.String())
-    change_rate = db.Column(db.Float())
-
-    def __init__(self, county_name, change_rate):
-        self.county_name = county_name
-        self.change_rate = change_rate
-
-    def __repr__(self):
-        return f"{self.county_name}:{self.change_rate}"
-
-
-class PlacesModel(db.Model):
-    __tablename__ = 'places_table'
-
-    id = db.Column(db.Integer, primary_key=True)
-    place_name = db.Column(db.String())
-    place_description = db.Column(db.String())
-    place_picture = db.Column(db.String())
-    place_map = db.Column(db.String())
-    county_id = db.Column(db.Integer, db.ForeignKey('counties_table.id'))
-    county = db.relationship("CountiesModel", backref=backref("request", uselist=False))
-
-
-class User(UserMixin, db.Model):
-    __tablename__ = 'user'
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), index=True, unique=True)
-    email = db.Column(db.String(150), unique=True, index=True)
-    password_hash = db.Column(db.String(150))
-    joined_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-
-class Memories(db.Model):
-    __tablename__ = "memories"
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String())
-    text = db.Column(db.String())
-    picture = db.Column(db.String())
-    owner = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
-    updated_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
-
-    # Shows up in the admin list
-    def __str__(self):
-        return self.title
 
 
 @login_manager.user_loader
@@ -257,4 +198,4 @@ def protected():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
