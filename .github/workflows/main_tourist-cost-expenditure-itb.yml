@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'tourist-cost-expenditure-itb'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2763515981F64DE2AC9D0123BD36F451 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FD800A99FC084F228C84B1CEA646C7A0 }}
