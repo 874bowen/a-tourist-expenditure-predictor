@@ -12,7 +12,6 @@ from flask_login import UserMixin, LoginManager, login_user, current_user, logou
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from forms import RegistrationForm, LoginForm, MemoryForm, photos
-from models import User, CountiesModel, PlacesModel, Memories, db
 
 SECRET_KEY = os.urandom(32)
 
@@ -54,14 +53,15 @@ app.config['UPLOADED_PHOTOS_DEST'] = 'uploads'
 configure_uploads(app, photos)
 from flask_sqlalchemy import SQLAlchemy
 
-# db = SQLAlchemy(app)
-db.init_app(app)
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 CORS(app)
+
+from models import User, CountiesModel, PlacesModel, Memories, db
+
 # configure Login Manager class in app
 login_manager = LoginManager()
 login_manager.init_app(app)
-
 
 
 @login_manager.user_loader
@@ -166,6 +166,7 @@ def login():
 def get_file(filename):
     return send_from_directory(app.config['UPLOADED_PHOTOS_DEST'], filename)
 
+
 @app.route("/memories", methods=['GET', 'POST'])
 @login_required
 def memory():
@@ -181,8 +182,9 @@ def memory():
         db.session.add(memory)
         db.session.commit()
     else:
-        file_url= None
+        file_url = None
     return render_template('memories.html', form=form, memories=memories)
+
 
 @app.route("/logout")
 # @login_required
