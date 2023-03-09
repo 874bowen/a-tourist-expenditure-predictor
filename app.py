@@ -1,37 +1,23 @@
 import os
+
 import flask
 import pickle
 import pandas as pd
-from flask import redirect, url_for, render_template, flash, request, send_from_directory
+from flask import redirect, url_for, render_template, flash, request, send_from_directory, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
 from sqlalchemy import desc
-from flask_uploads import UploadSet, IMAGES, configure_uploads
-from werkzeug.utils import secure_filename
-from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_uploads import configure_uploads
+from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 
-from forms import RegistrationForm, LoginForm, MemoryForm, photos
-
-SECRET_KEY = os.urandom(32)
-
-print(SECRET_KEY)
-
-plain_password = "qwerty"
-hashed_password = generate_password_hash(plain_password)
-print(hashed_password)
-submitted_password = "qwerty"
-matching_password = check_password_hash(hashed_password, submitted_password)
-print(matching_password)
+from forms import RegistrationForm, LoginForm, MemoryForm, photos, CountyForm, PlaceForm
 
 # Use pickle to load in the pre-trained model.
 with open(f'model/weather_model_two.pkl', 'rb') as f:
     model = pickle.load(f)
 app = flask.Flask(__name__, template_folder='templates')
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:Bowen123@localhost:5432/tourism_ke"
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# WEBSITE_HOSTNAME exists only in production environment
+
 if 'WEBSITE_HOSTNAME' not in os.environ:
     # local development, where we'll use environment variables
     print("Loading config.development and environment variables from .env file.")
@@ -71,9 +57,18 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
+
+    all_counties = CountiesModel.query.all()
+
     if flask.request.method == 'GET':
         print("We are here")
-        return (flask.render_template('main.html'))
+        featured_places = PlacesModel.query.filter_by(featured=True)
+        print("wait")
+        print(featured_places)
+
+        print("Counties === >>> ", all_counties)
+        return flask.render_template('main.html', featured_places=featured_places, all_counties=all_counties)
+
     if flask.request.method == 'POST':
         temperature = flask.request.form['temperature']
         rainfall = flask.request.form['humidity']
@@ -83,9 +78,7 @@ def main():
         data = CountiesModel.query.filter_by(county_name=place).first()
         rate = data.change_rate
         months = [0] * 11
-        places = PlacesModel.query.filter_by(county_id=data.id).first()
-        print(places.place_description)
-
+        suggested_places = PlacesModel.query.filter_by(county_id=data.id)
         if month == 1:
             months[3] = 1
         elif month == 2:
@@ -132,9 +125,38 @@ def main():
         return flask.render_template('main.html',
                                      original_input={'Temperature': temperature,
                                                      'Rainfall': rainfall},
+                                     all_counties=all_counties,
                                      result=prediction * rate,
-                                     places=places
+                                     suggested_places=suggested_places
                                      )
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required
+def admin():
+
+    if not (current_user.email == os.environ['admin']):
+        print(False)
+        return redirect(url_for('main'))
+
+    form_county = CountyForm()
+    form_place = PlaceForm()
+
+    if form_county.submit_county.data and form_county.validate_on_submit():
+        county = CountiesModel(county_name=form_county.county_name.data, change_rate=form_county.change_rate.data)
+        db.session.add(county)
+        db.session.commit()
+        return redirect(url_for('admin'))
+
+    elif form_place.submit_place.data and form_place.validate_on_submit():
+        print("We are here posting a place", form_place.place_name.data)
+        place = PlacesModel(place_name=form_place.place_name.data, place_description=form_place.place_description.data, place_picture=form_place.place_picture.data, place_map=form_place.place_map.data, county_id=form_place.county_id.data)
+        db.session.add(place)
+        print("We are here posting a place")
+        db.session.commit()
+        return redirect(url_for('admin'))
+
+    return render_template('admin.html', form_county=form_county, form_place=form_place)
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -143,7 +165,7 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password1.data)
-        db.session.add(user)
+        db.session.add(user) # add to db
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('registration.html', form=form)
@@ -178,7 +200,7 @@ def memory():
         file_url = url_for('get_file', filename=filename)
         print(current_user.id)
         print(file_url)
-        memory = Memories(title=form.title.data, text=form.text.data, picture=file_url, owner=form.owner.data)
+        memory = Memories(title=form.title.data, text=form.text.data, picture=file_url, owner=current_user.id)
         db.session.add(memory)
         db.session.commit()
     else:
@@ -198,6 +220,12 @@ def logout():
 def protected():
     return redirect(url_for('forbidden.html'))
 
+
+@app.route('/counties', methods=['GET'])
+def get_counties():
+    counties = CountiesModel.query.all()
+    print(counties)
+    return jsonify([county.toDict() for county in counties])
 
 if __name__ == '__main__':
     app.run()

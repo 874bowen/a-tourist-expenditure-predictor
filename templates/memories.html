@@ -38,7 +38,7 @@
    </div>
    <br>
    <div>
-      {{ form.picture.label }} {{ form.picture() }}
+      {{ form.picture.label }} {{ form.picture()}}
             {% if form.picture.errors %}
                 <div class="invalid-feedback">
                     {% for error in form.picture.errors %}
@@ -47,20 +47,6 @@
                 </div>
             {% endif %}
 
-   </div>
-   <br>
-   <div>
-      {{ form.owner(value='{{current_user.id}}',
-      style='width: 50%;
-      font-weight: bold;
-      padding: 12px 20px ;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box') }}
-      {% for error in form.owner.errors %}
-      <p>{{ error }}</p>
-      {% endfor %}
    </div>
    <br>
    <div>{{ form.submit(

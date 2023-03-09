@@ -23,10 +23,12 @@ form {
         <br>
 
         <select name="select_place" id="select_place">
-          <option value="Mombasa">Mombasa</option>
-          <option value="Narok">Narok</option>
-          <option value="Kajiado">Kajiado</option>
-          <option value="Nairobi">Nairobi</option>
+            <option value="">--choose county--</option>
+            {% if all_counties %}
+                {% for county in all_counties %}
+                    <option value="{{ county.county_name }}">{{ county.county_name }}</option>
+                {% endfor %}
+            {% endif %}
         </select>
         Temperature:
         <input name="temperature" type="number" id="temperature"  step="0.01" required>
@@ -71,9 +73,17 @@ form {
         <br> Predicted expenditure:
            <p style="font-size:50px">{{ result }}</p>
     {% endif %}
-    {% if places %}
-        <img src={{places.place_picture}} alt="place image" />
-        {{places.place_description}}
+    {% if suggested_places %}
+        {% for place in suggested_places %}
+            <img src={{place.place_picture}} alt="place-image" />
+            {{place.place_description}}
+        {% endfor %}
+    {% endif %}
+    {% if featured_places %}
+        {% for place in featured_places %}
+            <img src={{place.place_picture}} alt="place-image" />
+            {{place.place_description}}
+        {% endfor %}
     {% endif %}
     <div>
 
