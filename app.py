@@ -57,12 +57,17 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
+
+    all_counties = CountiesModel.query.all()
+
     if flask.request.method == 'GET':
         print("We are here")
         featured_places = PlacesModel.query.filter_by(featured=True)
         print("wait")
         print(featured_places)
-        return flask.render_template('main.html', featured_places=featured_places)
+
+        print("Counties === >>> ", all_counties)
+        return flask.render_template('main.html', featured_places=featured_places, all_counties=all_counties)
 
     if flask.request.method == 'POST':
         temperature = flask.request.form['temperature']
@@ -120,6 +125,7 @@ def main():
         return flask.render_template('main.html',
                                      original_input={'Temperature': temperature,
                                                      'Rainfall': rainfall},
+                                     all_counties=all_counties,
                                      result=prediction * rate,
                                      suggested_places=suggested_places
                                      )
