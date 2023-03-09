@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, FileField, validators, DateTimeField, \
-    IntegerField
+    IntegerField, FloatField
 from wtforms.validators import DataRequired, Email, EqualTo
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from wtforms.widgets import TextArea
@@ -32,5 +32,20 @@ class MemoryForm(FlaskForm):
         FileAllowed(photos, 'Only images are required'),
         FileRequired('File field should not be empty')
     ])
-    owner = IntegerField('Owner')
     submit = SubmitField('Post Memory')
+
+
+class CountyForm(FlaskForm):
+    county_name = StringField('County Name')
+    change_rate = FloatField('Change Rate')
+    submit_county = SubmitField('Add county')
+
+
+class PlaceForm(FlaskForm):
+    place_name = StringField('Place Name')
+    place_description = StringField('Place Description', widget=TextArea(), render_kw={'rows': 10})
+    place_picture = StringField('Image Link')
+    place_map = StringField('Map Link')
+    county_id = IntegerField('County ID')
+    featured = BooleanField('Featured')
+    submit_place = SubmitField('Add Place')
