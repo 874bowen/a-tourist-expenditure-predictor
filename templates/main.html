@@ -23,11 +23,12 @@ form {
         <br>
 
         <select name="select_place" id="select_place">
-            <option value="">--choose county -- </option>
-            <option value="Mombasa">Mombasa</option>
-            <option value="Narok">Narok</option>
-            <option value="Kajiado">Kajiado</option>
-            <option value="Nairobi">Nairobi</option>
+            <option value="">--choose county--</option>
+            {% if all_counties %}
+                {% for county in all_counties %}
+                    <option value="{{ county.county_name }}">{{ county.county_name }}</option>
+                {% endfor %}
+            {% endif %}
         </select>
         Temperature:
         <input name="temperature" type="number" id="temperature"  step="0.01" required>
