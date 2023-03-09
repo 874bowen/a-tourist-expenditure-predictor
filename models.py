@@ -9,8 +9,11 @@ class CountiesModel(db.Model):
     __tablename__ = 'counties_table'
 
     id = db.Column(db.Integer, primary_key=True)
-    county_name = db.Column(db.String())
+    county_name = db.Column(db.String(), unique=True)
     change_rate = db.Column(db.Float())
+
+    def toDict(self):
+        return dict(id=self.id, county_name=self.county_name, change_rate=self.change_rate)
 
     def __init__(self, county_name, change_rate):
         self.county_name = county_name
@@ -29,6 +32,7 @@ class PlacesModel(db.Model):
     place_picture = db.Column(db.String())
     place_map = db.Column(db.String())
     county_id = db.Column(db.Integer, db.ForeignKey('counties_table.id'))
+    featured = db.Column(db.Boolean, default=False)
     county = db.relationship("CountiesModel", backref=backref("request", uselist=False))
 
 
@@ -40,6 +44,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, index=True)
     password_hash = db.Column(db.String(150))
     joined_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
+    is_admin = db.Column(db.Boolean(), default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
