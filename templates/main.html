@@ -95,11 +95,13 @@
         <div class="visitcards">
             <h1>Locations you might like</h1>
         
-            <div>
-                <img src={{places.place_picture}} alt="place image" />
-                    {{places.place_description}}
-                {% endif %}
-            </div>
+            <section class="card-section">
+                <div class="card">
+                    <img class="card-img" src={{places.place_picture}} alt="place image" />
+                        <p class="card-text">{{places.place_description}}</p>
+                    {% endif %}
+                </div>
+            </section>
         </div>
     </body>
 </html>
