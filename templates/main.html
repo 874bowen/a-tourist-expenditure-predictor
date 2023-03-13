@@ -9,38 +9,52 @@
     </head>
     <body>
         <nav>
-            <div class="home">
-                <a href="{{ url_for('main') }}">Home</a>
+            <div>
+                <a  class="home" href="{{ url_for('main') }}">Home</a>
             </div>
             <div class="current_user">
                 {% if current_user.is_anonymous %}
-                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('login') }}"><button class="logout">Login</button></a>
                 {% else %}
-                <p>Logged in as {{current_user.username}}</p>
+                <p class="logged-in-as">Logged in as :{{current_user.username}}</p>
                 <a href="{{ url_for('logout') }}"><button class="logout">Logout</button></a>
                 {% endif %}
             </div>
         </nav>
-        <form action="{{ url_for('main') }}" method="POST">
-            <fieldset>
-
-                <legend>Input values:</legend>
-                Date:
+        <form action="{{ url_for('main') }}" method="POST" class="form-container">
+            <div class="form-body">
                 <input name="month-today" id="month-today" type="number" value="">
-                <br>
-
-                <select name="select_place" id="select_place">
-                <option value="Mombasa">Mombasa</option>
-                <option value="Narok">Narok</option>
-                <option value="Kajiado">Kajiado</option>
-                <option value="Nairobi">Nairobi</option>
-                </select>
-                Temperature:
-                <input name="temperature" type="number" id="temperature"  step="0.01" required>
-                <br>
-                <br> Humidity:
-                <input name="humidity" type="number" id="humidity"  step="0.01" required>
-                <br>
+                
+                <div class="form-item">
+                    <svg class="temp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M12 0C8.485 0 5.472 2.783 4.086 6.512c-1.386 3.728-.157 7.928 3.008 10.452l4.906 4.45a1.502 1.502 0 0 0 2.106 0l4.906-4.45c3.165-2.524 4.395-6.724 3.008-10.452C18.528 2.783 15.515 0 12 0zm0 8.311c-1.663 0-3-1.348-3-3s1.337-3 3-3 3 1.348 3 3-1.337 3-3 3z"/>
+                    </svg>                 
+                    <select name="select_place" id="select_place">
+                                 
+                        <option value="">Choose Location</option>
+                        <option value="Mombasa">Mombasa</option>
+                        <option value="Narok">Narok</option>
+                        <option value="Kajiado">Kajiado</option>
+                        <option value="Nairobi">Nairobi</option>
+                    </select>
+                </div>
+                
+                <div class="form-item">
+                    <svg class="temp-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2s-2-.9-2-2V5c0-1.1.9-2 2-2zM16.5 12c0 2.2-1.8 4-4 4s-4-1.8-4-4c0-2.2 1.8-4 4-4s4 1.8 4 4zM12 17c-1.7 0-3.2-.9-4-2.3V19c0 1.1.9 2 2 2s2-.9 2-2v-4h2v4c0 1.1.9 2 2 2s2-.9 2-2v-4.3c-.8 1.4-2.3 2.3-4 2.3z"/>
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                    </svg>
+                    <label>Temperature:</label>
+                    <input name="temperature" type="number" id="temperature"  step="0.01" required>
+                </div>
+                <div class="form-item">
+                    <svg class="temp-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zM7.88 9.88c-.19-.19-.32-.44-.32-.71 0-.27.13-.52.32-.71.39-.39 1.02-.39 1.41 0L12 11.59l1.41-1.41c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-2.59 2.59c-.19.19-.44.32-.71.32s-.52-.13-.71-.32L7.88 10.29c-.39-.39-.39-1.02 0-1.41zM16 10.5c0 .28.22.5.5.5s.5-.22.5-.5-.22-.5-.5-.5-.5.22-.5.5z"/>
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                    </svg>                      
+                    <label>Humidity: </label> 
+                    <input name="humidity" type="number" id="humidity"  step="0.01" required>
+                </div>
                 <script>
                     document.getElementById("month-today").value = new Date().getMonth();
                     const humidity = document.getElementById(('humidity'))
@@ -62,26 +76,30 @@
                         return weatherDataJson;
                     }
                     console.log(currWeather)
-
                 </script>
-                <br>
-                <input type="submit">
-            </fieldset>
+                <div  class="form-item">
+                    <input type="submit" class="submit-button">
+                </div>        
+            </div>
         </form>
         
         <div class="result">
-            {% if result %}
+            <!-- {% if result %}
                 {% for variable, value in original_input.items() %}
                     <b>{{ variable }}</b> : {{ value }}
-                {% endfor %}
-                <br>
-                <br> Predicted expenditure:
-                <p style="font-size:50px">{{ result }}</p>
+                {% endfor %} -->
+                <p class="">Expect to spend about: {{ result }}</p>
             {% endif %}
             {% if places %}
+        </div>
+        <div class="visitcards">
+            <h1>Locations you might like</h1>
+        
+            <div>
                 <img src={{places.place_picture}} alt="place image" />
-                {{places.place_description}}
-            {% endif %}
+                    {{places.place_description}}
+                {% endif %}
+            </div>
         </div>
     </body>
 </html>
