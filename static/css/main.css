@@ -1,0 +1,101 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #F5F5F5;
+}
+
+.visitcards {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4em;
+}
+
+.result {
+    display: flex;
+    justify-content: center;
+}
+
+#select_place {
+    border: none;
+    background-color: #F5F5F5;
+}
+
+.temp-icon {
+    width: 20px;
+    height: 20px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background-color: #ebe3e3;
+    border-radius: 10px;
+    margin: 1vw;
+}
+.home {
+    text-decoration: none;
+}
+
+.current_user {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+}
+
+.logout {
+    background-color: #ff0000;
+    color: #ded9d9;
+    border: none;
+    padding: .5em 1em;
+    border-radius: 5em;
+}
+#month-today {
+    display: none;
+}
+
+#humidity, #temperature {
+    border: none;
+    width: 20px;
+    background-color: inherit;
+}
+
+.form-container {
+    display: flex;
+    width: 100%;
+    gap: 3em;
+    justify-content: center;
+    margin: 2em;
+}
+.submit-button {
+    padding: 0 1em;
+    background-color: #4545c1;
+    color: white;
+    border: none;
+    height: 100%;
+}
+
+.form-body {
+    display: flex;
+    gap: 2em;
+    border: 1px solid #d6bebe;
+}
+
+.form-item {
+    height: 48px;
+    display: flex;
+    align-items: center;
+}
+
+@media screen and (max-width: 568px) {
+    .logged-in-as {
+        display: none;
+    }
+}
