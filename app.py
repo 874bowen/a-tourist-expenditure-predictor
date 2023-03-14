@@ -124,7 +124,7 @@ def main():
         prediction = model.predict(input_variables)[0]
         return flask.render_template('main.html',
                                      original_input={'Temperature': temperature,
-                                                     'Rainfall': rainfall},
+                                                     'Humidity': rainfall},
                                      all_counties=all_counties,
                                      result=prediction * rate,
                                      suggested_places=suggested_places
