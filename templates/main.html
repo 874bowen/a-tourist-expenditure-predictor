@@ -12,89 +12,110 @@ form {
 }
 </style>
 <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tourist Expenditure Model</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
-<form action="{{ url_for('main') }}" method="POST">
-    <fieldset>
-
-        <legend>Input values:</legend>
-        Date:
-        <input name="month-today" id="month-today" type="number" value="">
-        <br>
-
-        <select name="select_place" id="select_place">
-            <option value="">--choose county--</option>
-            {% if all_counties %}
-                {% for county in all_counties %}
-                    <option value="{{ county.county_name }}">{{ county.county_name }}</option>
-                {% endfor %}
+<body>
+    <nav>
+        <div>
+            <a  class="home" href="{{ url_for('main') }}">Home</a>
+        </div>
+        <div class="current_user">
+            {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}"><button class="logout">Login</button></a>
+            {% else %}
+            <p class="logged-in-as">Logged in as :{{current_user.username}}</p>
+            <a href="{{ url_for('logout') }}"><button class="logout">Logout</button></a>
             {% endif %}
-        </select>
-        Temperature:
-        <input name="temperature" type="number" id="temperature"  step="0.01" required>
-        <br>
-        <br> Humidity:
-        <input name="humidity" type="number" id="humidity"  step="0.01" required>
-        <br>
-        <script>
-            document.getElementById("month-today").value = new Date().getMonth();
-            const humidity = document.getElementById(('humidity'))
-            const temperature = document.getElementById('temperature');
-            const selectPlace = document.getElementById('select_place');
+        </div>
+    </nav>
+    <form action="{{ url_for('main') }}" method="POST" class="form-container">
+        <div class="form-body">
+            <input name="month-today" id="month-today" type="number" value="">
+            <div class="form-item">
+                <svg class="temp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12 0C8.485 0 5.472 2.783 4.086 6.512c-1.386 3.728-.157 7.928 3.008 10.452l4.906 4.45a1.502 1.502 0 0 0 2.106 0l4.906-4.45c3.165-2.524 4.395-6.724 3.008-10.452C18.528 2.783 15.515 0 12 0zm0 8.311c-1.663 0-3-1.348-3-3s1.337-3 3-3 3 1.348 3 3-1.337 3-3 3z"/>
+                </svg>
+                <select name="select_place" id="select_place">
+                    <option value="">--choose county--</option>
+                    {% if all_counties %}
+                        {% for county in all_counties %}
+                            <option value="{{ county.county_name }}">{{ county.county_name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="form-item">
+                <svg class="temp-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2s-2-.9-2-2V5c0-1.1.9-2 2-2zM16.5 12c0 2.2-1.8 4-4 4s-4-1.8-4-4c0-2.2 1.8-4 4-4s4 1.8 4 4zM12 17c-1.7 0-3.2-.9-4-2.3V19c0 1.1.9 2 2 2s2-.9 2-2v-4h2v4c0 1.1.9 2 2 2s2-.9 2-2v-4.3c-.8 1.4-2.3 2.3-4 2.3z"/>
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                </svg>
+            <label>Temperature:</label>
+            <input name="temperature" type="number" id="temperature"  step="0.01" required>
+            </div>
+            <div class="form-item">
+                <svg class="temp-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zM7.88 9.88c-.19-.19-.32-.44-.32-.71 0-.27.13-.52.32-.71.39-.39 1.02-.39 1.41 0L12 11.59l1.41-1.41c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-2.59 2.59c-.19.19-.44.32-.71.32s-.52-.13-.71-.32L7.88 10.29c-.39-.39-.39-1.02 0-1.41zM16 10.5c0 .28.22.5.5.5s.5-.22.5-.5-.22-.5-.5-.5-.5.22-.5.5z"/>
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                </svg>
+                <label>Humidity: </label>
+                <input name="humidity" type="number" id="humidity"  step="0.01" required>
+            </div>
+            <script>
+                document.getElementById("month-today").value = new Date().getMonth();
+                const humidity = document.getElementById(('humidity'))
+                const temperature = document.getElementById('temperature');
+                const selectPlace = document.getElementById('select_place');
 
-            selectPlace.addEventListener('change', () => {
-                var place=document.getElementById('select_place').value;
-                checkWeather(place)
-            })
-            let currWeather;
-            const checkWeather = async (place, callback) => {
-                let weatherData  = await fetch(`https://api.weatherapi.com/v1/current.json?key=be14007191cf4192b20110252231002&q=${place}&aqi=no`)
-                let weatherDataJson = await weatherData.json();
-                currWeather = weatherDataJson;
-                humidity.value = weatherDataJson.current.humidity;
-                temperature.value = weatherDataJson.current.feelslike_c;
-                console.log(weatherDataJson.current)
-                return weatherDataJson;
-            }
-            console.log(currWeather)
+                selectPlace.addEventListener('change', () => {
+                    var place=document.getElementById('select_place').value;
+                    checkWeather(place)
+                })
+                let currWeather;
+                const checkWeather = async (place, callback) => {
+                    let weatherData  = await fetch(`https://api.weatherapi.com/v1/current.json?key=be14007191cf4192b20110252231002&q=${place}&aqi=no`)
+                    let weatherDataJson = await weatherData.json();
+                    currWeather = weatherDataJson;
+                    humidity.value = weatherDataJson.current.humidity;
+                    temperature.value = weatherDataJson.current.feelslike_c;
+                    console.log(weatherDataJson.current)
+                    return weatherDataJson;
+                }
+                console.log(currWeather)
 
-        </script>
-        <br>
-        <input type="submit">
-    </fieldset>
-</form>
-<br>
-<div class="result" align="center">
-    {% if result %}
-        {% for variable, value in original_input.items() %}
-            <b>{{ variable }}</b> : {{ value }}
-        {% endfor %}
-        <br>
-        <br> Predicted expenditure:
-           <p style="font-size:50px">{{ result }}</p>
-    {% endif %}
-    {% if suggested_places %}
-        {% for place in suggested_places %}
-            <img src={{place.place_picture}} alt="place-image" />
-            {{place.place_description}}
-        {% endfor %}
-    {% endif %}
-    {% if featured_places %}
-        {% for place in featured_places %}
-            <img src={{place.place_picture}} alt="place-image" />
-            {{place.place_description}}
-        {% endfor %}
-    {% endif %}
-    <div>
-
-  <a href="{{ url_for('main') }}">Home</a>
-  {% if current_user.is_anonymous %}
-  <a href="{{ url_for('login') }}">Login</a>
-  {% else %}
-  <p>Welcome {{current_user.username}}</p>
-  <a href="{{ url_for('logout') }}">Logout</a>
-  {% endif %}
-
-</div>
-</div>
+            </script>
+            <div  class="form-item">
+                <input class="submit-button" type="submit">
+            </div>
+        </div>
+    </form>
+    <br>
+    <div class="result" align="center">
+        {% if result %}
+            {% for variable, value in original_input.items() %}
+                <b>{{ variable }}</b> : {{ value }}
+            {% endfor %}
+            <br>
+            <br> Predicted expenditure:
+               <p style="font-size:50px">{{ result }}</p>
+        {% endif %}
+        {% if suggested_places %}
+            {% for place in suggested_places %}
+                <img src={{place.place_picture}} alt="place-image" />
+                {{place.place_description}}
+            {% endfor %}
+        {% endif %}
+        {% if featured_places %}
+            {% for place in featured_places %}
+                <img src={{place.place_picture}} alt="place-image" />
+                {{place.place_description}}
+            {% endfor %}
+        {% endif %}
+        <div>
+    </div>
+    </div>
+</body>
 </html>
