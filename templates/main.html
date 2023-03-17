@@ -24,19 +24,52 @@ form {
 <body>
     <nav>
         <div>
-            <a  class="home" href="{{ url_for('main') }}">Home</a>
+            <a class="home" href="{{ url_for('main') }}">Home</a>
         </div>
         <div class="current_user">
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}"><button class="logout">Login</button></a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Login</button>
             {% else %}
-            <p class="logged-in-as">Logged in as :{{current_user.username}}</p>
-            <a href="{{ url_for('logout') }}"><button class="logout">Logout</button></a>
+                <a class="home" href="{{ url_for('visits') }}"><h6>Visits - <span id="visit-item-count">{{ visits }}</span></h6></a>
+                <p class="logged-in-as">Logged in as :{{current_user.username}}</p>
+                <a href="{{ url_for('logout') }}"><button class="btn btn-primary">Logout</button></a>
             {% endif %}
         </div>
     </nav>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sign In</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post" class="form">
+                   {{ form.hidden_tag() }}
+                   <div class="row mb-3">
+                      {{ form.email(placeholder="email") }}
+                      {% for error in form.email.errors %}
+                      <p>{{ error }}</p>
+                      {% endfor %}
+                   </div>
+                   <br>
+                   <div class="row mb-3">
+                      {{ form.password(placeholder="password") }}
+                      {% for error in form.password.errors %}
+                      <p>{{ error }}</p>
+                      {% endfor %}
+                   </div>
+                   <p class="text-dark">{{ form.remember() }} {{ form.remember.label }}</p>
+                   {{ form.submit_login(class ='btn btn-primary') }}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-
+                <p class="text-dark">Don't have an account? <a href="{{ url_for('register') }}">Create a new Account!</a></p>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
 
     <div class="container">
         <div class="row">
@@ -138,8 +171,10 @@ form {
                         <img src={{place.place_picture}} class="rounded" alt="place-image" />
                     </div>
                     <div class="col-12 col-md-8">
-                        <h3 class="mb-2">{{ place.place_name }}</h3>
+                        <h3 class="mb-2">{{ place.place_name }} - {{ place.rating }} star rated</h3>
                         {{place.place_description}}
+                        <i>Go to <a href="{{ place.place_map }}" target="_blank">maps </a></i>
+                        <button class="add-to-visit-btn ml-2 btn btn-info" data-place-id="{{ place.id }}">Add ToVisit</button>
                     </div>
                 </div>
             {% endfor %}
@@ -152,9 +187,10 @@ form {
                         <img src={{place.place_picture}} class="rounded" alt="place-image" />
                     </div>
                     <div class="col-12 col-md-8">
-                        <h3 class="mb-2">{{ place.place_name }}</h3>
+                        <h3 class="mb-2">{{ place.place_name }} - {{ place.rating }} star rated</h3>
                         {{ place.place_description }}
                         <i>Go to <a href="{{ place.place_map }}" target="_blank">maps </a></i>
+                        <button class="add-to-visit-btn ml-2 btn btn-info" data-place-id="{{ place.id }}">Add ToVisit</button>
                     </div>
                 </div>
             {% endfor %}
@@ -173,6 +209,33 @@ form {
           loadingDiv.style.display = "none";
           placesDiv.style.display = "block";
         }, 2500);
+
+        function addToVisit(placeId) {
+            fetch('/to-visit/add', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'place_id': placeId
+                })
+            })
+            .then(response => response.json()
+            )
+            .then(data => {
+                document.querySelector('#visit-item-count').textContent = data.length;
+                console.log(data.item_count, data.length)
+            })
+            .catch(error => {
+                console.error('Error adding item to cart:', error);
+            });
+        }
+
+        document.querySelectorAll('.add-to-visit-btn').forEach(button => {
+          button.addEventListener('click', event => {
+            const productId = event.target.dataset.placeId;
+            console.log("Here ", productId)
+            addToVisit(productId);
+          });
+});
+
     </script>
 </body>
 </html>
