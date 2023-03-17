@@ -1,3 +1,4 @@
+import math
 import os
 
 import flask
@@ -6,7 +7,7 @@ import pandas as pd
 from flask import redirect, url_for, render_template, flash, request, send_from_directory, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from flask_uploads import configure_uploads
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 
@@ -43,7 +44,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 CORS(app)
 
-from models import User, CountiesModel, PlacesModel, Memories, db
+from models import User, CountiesModel, PlacesModel, Memories, db, ToVisit
 
 # configure Login Manager class in app
 login_manager = LoginManager()
@@ -59,6 +60,7 @@ def load_user(user_id):
 def main():
 
     all_counties = CountiesModel.query.all()
+    form_login = LoginForm()
 
     if flask.request.method == 'GET':
         print("We are here")
@@ -67,9 +69,19 @@ def main():
         print(featured_places)
 
         print("Counties === >>> ", all_counties)
-        return flask.render_template('main.html', featured_places=featured_places, all_counties=all_counties)
+        return flask.render_template('main.html', featured_places=featured_places, all_counties=all_counties, form=form_login)
 
     if flask.request.method == 'POST':
+
+        if form_login.validate_on_submit():
+            user = User.query.filter_by(email=form_login.email.data).first()
+            if user is not None and user.check_password(form_login.password.data):
+                login_user(user)
+                next = request.args.get("next")
+                return redirect(next or url_for('main'))
+            flash('Invalid email address or Password.')
+            return render_template('main.html')
+
         temperature = flask.request.form['temperature']
         rainfall = flask.request.form['humidity']
         month = flask.request.form['month-today']
@@ -79,6 +91,8 @@ def main():
         rate = data.change_rate
         months = [0] * 11
         suggested_places = PlacesModel.query.filter_by(county_id=data.id)
+        visits = ToVisit.query.filter_by(user_id=current_user.id)
+
         if month == 1:
             months[3] = 1
         elif month == 2:
@@ -128,7 +142,9 @@ def main():
                                      all_counties=all_counties,
                                      result=round((prediction * rate), 2),
                                      suggested_places=suggested_places,
-                                     county=data
+                                     county=data,
+                                     form=form_login,
+                                     visits=len(visits)
                                      )
 
 
@@ -227,6 +243,63 @@ def get_counties():
     counties = CountiesModel.query.all()
     print(counties)
     return jsonify([county.toDict() for county in counties])
+
+@app.route('/to-visit/add', methods=['POST'])
+def add_to_visit():
+    place_id = request.form.get('place_id')
+    print("Adding Visit")
+    print(place_id)
+    # Add product to user's cart in database
+    tovisit = ToVisit(place_id=place_id, user_id=current_user.id)
+    db.session.add(tovisit)  # add to db
+    db.session.commit()
+    visits = ToVisit.query.filter_by(user_id=current_user.id)
+    # Return JSON response with updated cart information
+    return jsonify([visit.toDict() for visit in visits])
+
+
+@app.route('/to-visit', methods=['GET', 'POST'])
+def visits():
+    visits = ToVisit.query.filter_by(user_id=current_user.id)
+
+    return render_template('visits.html', visits=visits)
+
+
+@app.route("/rate/<int:visit_id>/<int:rating>")
+def rate_task(visit_id, rating):
+    # Update task rating in database
+    visit = ToVisit.query.filter_by(id=visit_id, user_id=current_user.id).first()
+
+    count = ToVisit.query.filter_by(place_id=visit.place_id).count()
+    total = db.session.query(func.sum(ToVisit.rate)).filter_by(place_id=visit.place_id).scalar()
+    print(count, total, total/count)
+    place = PlacesModel.query.filter_by(id=visit.place_id).first()
+    place.rating = math.ceil(total/count)
+    visit.rate = rating
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+@app.route("/toggle-visit", methods=['POST'])
+def toggleVisit():
+    visit_id = request.form.get('visit_id')
+    print("Visit id for toggle", visit_id)
+    visit = ToVisit.query.filter_by(id=visit_id, user_id=current_user.id).first()
+    print(visit.id)
+    visit.visited = not visit.visited
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+@app.route('/delete-visit', methods=['POST'])
+def deleteVisit():
+    visit_id = request.form.get('visit_id')
+    print("Deleting ", visit_id)
+    tovisit = ToVisit.query.filter_by(id=visit_id, user_id=current_user.id).first()
+    db.session.delete(tovisit)
+    db.session.commit()
+    return jsonify({"success": True})
+
 
 if __name__ == '__main__':
     app.run()
