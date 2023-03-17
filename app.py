@@ -126,8 +126,9 @@ def main():
                                      original_input={'Temperature': temperature,
                                                      'Humidity': rainfall},
                                      all_counties=all_counties,
-                                     result=prediction * rate,
-                                     suggested_places=suggested_places
+                                     result=round((prediction * rate), 2),
+                                     suggested_places=suggested_places,
+                                     county=data
                                      )
 
 
