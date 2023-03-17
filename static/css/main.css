@@ -5,6 +5,12 @@
     box-sizing: border-box;
 }
 
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
 body {
     background-color: #F5F5F5;
 }
@@ -70,12 +76,6 @@ nav {
 }
 #month-today {
     display: none;
-}
-
-#humidity, #temperature {
-    border: none;
-    width: 50px;
-    background-color: inherit;
 }
 
 .form-container {
