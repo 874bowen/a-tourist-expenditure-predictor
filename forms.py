@@ -19,7 +19,7 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me', validators=[DataRequired()])
-    submit = SubmitField('Login')
+    submit_login = SubmitField('Login')
 
 
 photos = UploadSet('photos', IMAGES)
