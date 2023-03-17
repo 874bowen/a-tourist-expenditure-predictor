@@ -31,6 +31,7 @@ class PlacesModel(db.Model):
     place_description = db.Column(db.String())
     place_picture = db.Column(db.String())
     place_map = db.Column(db.String())
+    rating= db.Column(db.Integer(), default=5)
     county_id = db.Column(db.Integer, db.ForeignKey('counties_table.id'))
     featured = db.Column(db.Boolean, default=False)
     county = db.relationship("CountiesModel", backref=backref("request", uselist=False))
@@ -68,3 +69,22 @@ class Memories(db.Model):
     def __str__(self):
         return self.title
 
+
+class ToVisit(db.Model):
+    __tablename__ = "tovisit"
+
+    def toDict(self):
+        return dict(id=self.id, place_id=self.place_id, visited=self.visited)
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    place_id = db.Column(db.Integer, db.ForeignKey('places_table.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    visited = db.Column(db.Boolean, default=False)
+    rate = db.Column(db.Integer, default=5)
+    place = db.relationship("PlacesModel", backref=backref("request", uselist=False))
+    user = db.relationship("User",  backref=backref("request", uselist=False))
+
+    __table_args__ = (
+        db.UniqueConstraint('place_id', 'user_id', name='_unique_place_id_user_id'),
+    )
