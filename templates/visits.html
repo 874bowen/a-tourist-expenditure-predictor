@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tourist Expenditure Model</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+</head>
+<body>
+    <button type="button" class="btn btn-outline-dark" onclick="location.reload()">Update Changes</button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Rate us</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="" method="post" onsubmit="submitRating(event)" class="form">
+                <input type="text" name="visit_id" id="visit-id">
+                <label for="customRange3" class="form-label">Please Rate:</label>
+                <input type="range" class="form-range" min="0" max="5" value="5" step="1" id="customRange3" name="rating" id="rating">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+        {% if visits %}
+            {% for visit in visits %}
+                    <div class="row gap-1 mb-2">
+                        <div class="col-6">
+                            <p>{{ visit.place.place_name }}</p>
+                        </div>
+                        {% if visit.visited == False %}
+                            <div class="col-3">
+                                <button type="button" class="btn btn-success toggle-visit-btn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-visit-id="{{ visit.id }}">Mark Visit</button>
+                            </div>
+                        {% endif %}
+                        {% if visit.visited == True %}
+
+                            <div class="col-3">
+                                <button type="button" class="btn btn-warning toggle-visit-btn" data-visit-id="{{ visit.id }}"><span class="text-nowrap">Not Visit</span></button>
+                            </div>
+                        {% endif %}
+                        <div class="col-2">
+                            <button type="button" class="btn btn-danger delete-visit-btn" data-visit-id="{{ visit.id }}">Delete</button>
+                        </div>
+                    </div>
+                {% endfor %}
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script>
+        function toggleVisit(visitId) {
+            fetch('/toggle-visit', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'visit_id': visitId
+                })
+            })
+            .then(response => response.json()
+            )
+            .then(data => data)
+            .catch(error => {
+                console.error('Error adding item to cart:', error);
+            });
+        }
+
+        document.querySelectorAll('.toggle-visit-btn').forEach(button => {
+            button.addEventListener('click', event => {
+                const visitId = event.target.dataset.visitId;
+                document.getElementById('visit-id').value = visitId;
+                console.log("Here Visit ", visitId)
+                toggleVisit(visitId);
+            });
+        });
+
+        function deleteVisit(visitId) {
+            fetch('/delete-visit', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'visit_id': visitId
+                })
+            })
+            .then(response => response.json()
+            )
+            .then(data => data)
+            .catch(error => {
+                console.error('Error adding item to cart:', error);
+            });
+        }
+
+        document.querySelectorAll('.delete-visit-btn').forEach(button => {
+            button.addEventListener('click', event => {
+                const visitId = event.target.dataset.visitId;
+                console.log("Here Visit ", visitId)
+                deleteVisit(visitId);
+            });
+        });
+
+
+        function submitRating(event) {
+            event.preventDefault();
+            const form = event.target;
+            const visitId = form.elements.visit_id.value;
+            const rating = form.elements.rating.value;
+            console.log(visitId, rating)
+            fetch(`/rate/${visitId}/${rating}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                  console.log(data);
+                })
+                .catch(error => {
+                  console.error(error);
+                });
+        }
+</script>
+</body>
+</html>
