@@ -10,6 +10,7 @@ class CountiesModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     county_name = db.Column(db.String(), unique=True)
+    is_safe = db.Column(db.Boolean, default=True)
     change_rate = db.Column(db.Float())
 
     def toDict(self):
@@ -31,7 +32,7 @@ class PlacesModel(db.Model):
     place_description = db.Column(db.String())
     place_picture = db.Column(db.String())
     place_map = db.Column(db.String())
-    rating= db.Column(db.Integer(), default=5)
+    rating = db.Column(db.Integer(), default=5)
     county_id = db.Column(db.Integer, db.ForeignKey('counties_table.id'))
     featured = db.Column(db.Boolean, default=False)
     county = db.relationship("CountiesModel", backref=backref("request", uselist=False))
@@ -46,6 +47,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(150))
     joined_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
     is_admin = db.Column(db.Boolean(), default=False)
+    is_anchor = db.Column(db.Boolean(), default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -77,14 +79,28 @@ class ToVisit(db.Model):
         return dict(id=self.id, place_id=self.place_id, visited=self.visited)
 
     id = db.Column(db.Integer, primary_key=True)
-
     place_id = db.Column(db.Integer, db.ForeignKey('places_table.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     visited = db.Column(db.Boolean, default=False)
     rate = db.Column(db.Integer, default=5)
     place = db.relationship("PlacesModel", backref=backref("request", uselist=False))
-    user = db.relationship("User",  backref=backref("request", uselist=False))
+    user = db.relationship("User", backref=backref("request", uselist=False))
 
     __table_args__ = (
         db.UniqueConstraint('place_id', 'user_id', name='_unique_place_id_user_id'),
     )
+
+
+class News(db.Model):
+    __tablename__ = "news"
+
+    id = db.Column(db.Integer, primary_key=True)
+    topic = db.Column(db.String())
+    news = db.Column(db.String())
+    type = db.Column(db.String())
+    recommendation = db.Column((db.Integer()))
+    created_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
+    county_id = db.Column(db.Integer, db.ForeignKey('counties_table.id'))
+    news_anc_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    county = db.relationship("CountiesModel", backref=backref("county", uselist=False))
