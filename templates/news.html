@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tourist Expenditure Model</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <nav>
+        <div>
+            <a class="home" href="{{ url_for('main') }}">Home</a>
+        </div>
+        <div class="current_user">
+            {% if current_user.is_anonymous %}
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Login</button>
+            {% else %}
+                <a class="home" href="{{ url_for('visits') }}"><h6>Visits</h6></a>
+                <a class="home" href="{{ url_for('view_news') }}"><h6>News</h6></a>
+                <p class="logged-in-as">{{current_user.username}}</p>
+                <a href="{{ url_for('logout') }}"><button class="btn btn-primary">Logout</button></a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        {% if news %}
+            {% for new in news %}
+                <div class="row gap-2 mb-2">
+                    <div class="col-12">
+                        <h3 class="mb-2">{{ new.topic }} - {{ new.created_at }}</h3>
+                        {{ new.news }}
+                        {% if new.recommendation > 3 %}
+                            <p><span class="text-danger">{{ new.county.county_name }}</span> <i>#{{ new.type }}</i> </p>
+                        {% else %}
+                            <p><span class="text-success">{{ new.county.county_name }}</span> <i>#{{ new.type }}</i> </p>
+                        {% endif %}
+                        {% if current_user.is_admin or current_user.is_anchor %}
+                            <button type="button" class="btn btn-danger delete-news-btn" data-news-id="{{ new.id }}">Delete</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <footer class="bg-secondary text-white text-center p-3 position-relative bottom-0 col-12">
+        @Copyright tourism-kenya, 2023
+    </footer>
+    <script>
+        function deleteNews(newsId) {
+            fetch('/delete-news', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'news_id': newsId
+                })
+            })
+            .then(response => response.json()
+            )
+            .then(data => data)
+            .catch(error => {
+                console.error('Error adding item to cart:', error);
+            });
+        }
+
+        document.querySelectorAll('.delete-news-btn').forEach(button => {
+            button.addEventListener('click', event => {
+                const newsId = event.target.dataset.newsId;
+                console.log("Here Visit ", newsId)
+                deleteNews(newsId);
+            });
+        });
+    </script>
+</body>
+</html>
