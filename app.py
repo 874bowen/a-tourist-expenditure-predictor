@@ -18,7 +18,6 @@ with open(f'model/weather_model_two.pkl', 'rb') as f:
     model = pickle.load(f)
 app = flask.Flask(__name__, template_folder='templates')
 
-
 if 'WEBSITE_HOSTNAME' not in os.environ:
     # local development, where we'll use environment variables
     print("Loading config.development and environment variables from .env file.")
@@ -44,7 +43,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 CORS(app)
 
-from models import User, CountiesModel, PlacesModel, Memories, db, ToVisit
+from models import User, CountiesModel, PlacesModel, Memories, db, ToVisit, News
 
 # configure Login Manager class in app
 login_manager = LoginManager()
@@ -58,7 +57,6 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-
     all_counties = CountiesModel.query.all()
     form_login = LoginForm()
 
@@ -69,7 +67,8 @@ def main():
         print(featured_places)
 
         print("Counties === >>> ", all_counties)
-        return flask.render_template('main.html', featured_places=featured_places, all_counties=all_counties, form=form_login)
+        return flask.render_template('main.html', featured_places=featured_places, all_counties=all_counties,
+                                     form=form_login)
 
     if flask.request.method == 'POST':
 
@@ -143,15 +142,13 @@ def main():
                                      result=round((prediction * rate), 2),
                                      suggested_places=suggested_places,
                                      county=data,
-                                     form=form_login,
-                                     visits=len(visits)
+                                     form=form_login
                                      )
 
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
-
     if not (current_user.email == os.environ['admin']):
         print(False)
         return redirect(url_for('main'))
@@ -167,7 +164,9 @@ def admin():
 
     elif form_place.submit_place.data and form_place.validate_on_submit():
         print("We are here posting a place", form_place.place_name.data)
-        place = PlacesModel(place_name=form_place.place_name.data, place_description=form_place.place_description.data, place_picture=form_place.place_picture.data, place_map=form_place.place_map.data, county_id=form_place.county_id.data)
+        place = PlacesModel(place_name=form_place.place_name.data, place_description=form_place.place_description.data,
+                            place_picture=form_place.place_picture.data, place_map=form_place.place_map.data,
+                            county_id=form_place.county_id.data)
         db.session.add(place)
         print("We are here posting a place")
         db.session.commit()
@@ -182,7 +181,7 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password1.data)
-        db.session.add(user) # add to db
+        db.session.add(user)  # add to db
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('registration.html', form=form)
@@ -244,6 +243,7 @@ def get_counties():
     print(counties)
     return jsonify([county.toDict() for county in counties])
 
+
 @app.route('/to-visit/add', methods=['POST'])
 def add_to_visit():
     place_id = request.form.get('place_id')
@@ -272,9 +272,9 @@ def rate_task(visit_id, rating):
 
     count = ToVisit.query.filter_by(place_id=visit.place_id).count()
     total = db.session.query(func.sum(ToVisit.rate)).filter_by(place_id=visit.place_id).scalar()
-    print(count, total, total/count)
+    print(count, total, total / count)
     place = PlacesModel.query.filter_by(id=visit.place_id).first()
-    place.rating = math.ceil(total/count)
+    place.rating = math.ceil(total / count)
     visit.rate = rating
     db.session.commit()
     return jsonify({"success": True})
@@ -300,6 +300,57 @@ def deleteVisit():
     db.session.commit()
     return jsonify({"success": True})
 
+
+# news
+@app.route('/news', methods=['GET'])
+def view_news():
+    news = News.query.all()
+    return render_template('news.html', news=news)
+
+
+@app.route('/news/create', methods=['GET', 'POST'])
+def create_news():
+    counties = CountiesModel.query.all()
+    if request.method == 'POST':
+        county_name = flask.request.form['select_place']
+        topic = flask.request.form['topic']
+        news = flask.request.form['news']
+        type_n = flask.request.form['select_type']
+        recomm = flask.request.form['recomm']
+        county = CountiesModel.query.filter_by(county_name=county_name).first()
+        # safety
+        count = News.query.filter_by(county_id=county.id).count()
+        total = db.session.query(func.sum(News.recommendation)).filter_by(county_id=county.id).scalar()
+
+        if count > 0:
+            avg_recomm = math.ceil(total / count)
+            print(avg_recomm, "is this")
+            if avg_recomm >= 3:
+                county.is_safe = True
+            else:
+                county.is_safe = False
+
+        else:
+            if recomm >= 3:
+                county.is_safe = True
+            else:
+                county.is_safe = False
+
+        news = News(topic=topic, news=news, type=type_n, recommendation=recomm, county_id=county.id, news_anc_id=current_user.id)
+        db.session.add(news)
+        db.session.commit()
+        return 'News created successfully'
+    return render_template('create_news.html', all_counties=counties)
+
+
+@app.route('/delete-news', methods=['POST'])
+def deleteNews():
+    news_id = request.form.get('news_id')
+    print("Deleting ", news_id)
+    todel = News.query.filter_by(id=news_id, news_anc_id=current_user.id).first()
+    db.session.delete(todel)
+    db.session.commit()
+    return jsonify({"success": True})
 
 if __name__ == '__main__':
     app.run()
