@@ -269,14 +269,13 @@ def visits():
 def rate_task(visit_id, rating):
     # Update task rating in database
     visit = ToVisit.query.filter_by(id=visit_id, user_id=current_user.id).first()
-
+    visit.rate = rating
+    db.session.commit()
     count = ToVisit.query.filter_by(place_id=visit.place_id).count()
     total = db.session.query(func.sum(ToVisit.rate)).filter_by(place_id=visit.place_id).scalar()
     print(count, total, total / count)
     place = PlacesModel.query.filter_by(id=visit.place_id).first()
     place.rating = math.ceil(total / count)
-    visit.rate = rating
-    db.session.commit()
     return jsonify({"success": True})
 
 
@@ -331,7 +330,7 @@ def create_news():
                 county.is_safe = False
 
         else:
-            if recomm >= 3:
+            if int(recomm) >= 3:
                 county.is_safe = True
             else:
                 county.is_safe = False
@@ -351,6 +350,7 @@ def deleteNews():
     db.session.delete(todel)
     db.session.commit()
     return jsonify({"success": True})
+
 
 if __name__ == '__main__':
     app.run()
