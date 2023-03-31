@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    <nav>
+    <nav class="navbar navbar-dark sticky-top">
         <div>
             <a class="home" href="{{ url_for('main') }}">Home</a>
         </div>
@@ -17,8 +17,8 @@
             {% if current_user.is_anonymous %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Login</button>
             {% else %}
-                <a class="home" href="{{ url_for('visits') }}"><h6>Visits</h6></a>
-                <a class="home" href="{{ url_for('view_news') }}"><h6>News</h6></a>
+                <a class="home" href="{{ url_for('visits') }}">Visits</a>
+                <a class="home" href="{{ url_for('view_news') }}">News</a>
                 <p class="logged-in-as">{{current_user.username}}</p>
                 <a href="{{ url_for('logout') }}"><button class="btn btn-primary">Logout</button></a>
             {% endif %}
@@ -44,8 +44,46 @@
             {% endfor %}
         {% endif %}
     </div>
-    <footer class="bg-secondary text-white text-center p-3 position-relative bottom-0 col-12">
-        @Copyright tourism-kenya, 2023
+        <footer class="footer w-100 position-absolute bottom-0 poo">
+        <div class="container">
+            <div class="row">
+                <div class="col-4 col-sm-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main') }}">Home</a></li>
+                        <li><a href="{{ url_for('visits') }}">Visits</a></li>
+                        <li><a href="{{ url_for('view_news') }}">News</a></li>
+                    </ul>
+                </div>
+                <div class="col-7 col-sm-5">
+                    <h5>Our Address</h5>
+                    <address>
+		              121, Nakuru-Kabarak road<br>
+		              TourWise, Nakuru<br>
+		              KENYA<br>
+		              Tel.: +254 791 440-095<br>
+                      Fax1: +254 757 185-189<br>
+                      Fax2: +254 797 696-485<br>
+		              Email: <a href="mailto:tourwise@gmail.com">tourwise@gmail.com</a>
+		           </address>
+                </div>
+                <div class="col-12 col-sm-4 align-self-center">
+                    <div class="text-center">
+                        <a href="http://google.com/+">Google+</a>
+                        <a href="http://www.facebook.com/profile.php?id=">Facebook</a>
+                        <a href="http://www.linkedin.com/in/">LinkedIn</a>
+                        <a href="http://twitter.com/">Twitter</a>
+                        <a href="http://youtube.com/">YouTube</a>
+                        <a href="mailto:">Mail</a>
+                    </div>
+                </div>
+           </div>
+           <div class="row justify-content-center">
+                <div class="col-auto">
+                    <p>© Copyright 2023 TourWise</p>
+                </div>
+           </div>
+        </div>
     </footer>
     <script>
         function deleteNews(newsId) {
