@@ -22,7 +22,7 @@ form {
 
 </head>
 <body>
-    <nav>
+    <nav class="navbar navbar-dark sticky-top">
         <div>
             <a class="home" href="{{ url_for('main') }}">Home</a>
         </div>
@@ -30,8 +30,8 @@ form {
             {% if current_user.is_anonymous %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Login</button>
             {% else %}
-                <a class="home" href="{{ url_for('visits') }}"><h6>Visits</h6></a>
-                <a class="home" href="{{ url_for('view_news') }}"><h6>News</h6></a>
+                <a class="home" href="{{ url_for('visits') }}">Visits</a>
+                <a class="home" href="{{ url_for('view_news') }}">News</a>
                 <p class="logged-in-as">{{current_user.username}}</p>
                 <a href="{{ url_for('logout') }}"><button class="btn btn-primary">Logout</button></a>
             {% endif %}
@@ -72,40 +72,74 @@ form {
           </div>
         </div>
 
-    <div class="container">
+    <div class="container mt-10">
         <div class="row">
             <div class="col-md-6">
-                <form action="{{ url_for('main') }}" class="bg-secondary" method="POST">
+                <form action="{{ url_for('main') }}" class="predict-form mb-2" method="POST">
 {#                    <div class="form-body">#}
                         <input name="month-today" id="month-today" type="number" value="">
                         <div class="row mb-3">
-                            <svg class="temp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                                <path fill="currentColor" d="M12 0C8.485 0 5.472 2.783 4.086 6.512c-1.386 3.728-.157 7.928 3.008 10.452l4.906 4.45a1.502 1.502 0 0 0 2.106 0l4.906-4.45c3.165-2.524 4.395-6.724 3.008-10.452C18.528 2.783 15.515 0 12 0zm0 8.311c-1.663 0-3-1.348-3-3s1.337-3 3-3 3 1.348 3 3-1.337 3-3 3z"/>
-                            </svg>
-                            <select name="select_place" class="form-select" id="select_place">
-                                <option value="">--choose county--</option>
-                                {% if all_counties %}
-                                    {% for county in all_counties %}
-                                        <option value="{{ county.county_name }}">{{ county.county_name }}</option>
-                                    {% endfor %}
-                                {% endif %}
+                            <div class="col-md-6">
+                                <select name="select_place" class="form-select" id="select_place">
+                                    <option value="">--choose county--</option>
+                                    {% if all_counties %}
+                                        {% for county in all_counties %}
+                                            <option value="{{ county.county_name }}">{{ county.county_name }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Enter age:</label>
+                                <input name="age" type="number" id="age" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Temperature:</label>
+                                <input name="temperature" type="number" id="temperature"  step="0.01" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Income in Ksh:</label>
+                                <input name="income" type="number" id="income" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Humidity: </label>
+                                <input name="humidity" type="number" id="humidity"  step="0.01" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Duration of stay: </label>
+                                <input name="duration" type="number" id="duration"  required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Gender: </label>
+                                <select name="select_gender" class="form-select" id="select_gender">
+                                    <option value="1">Male</option>
+                                    <option value="0">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Number of people: </label>
+                                <input name="no_of_people" type="number" id="no_of_people" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <select name="select_accommodation" class="form-select" id="select_accommodation">
+                                <option value="">--Type of Desired Accommodation--</option>
+                                <option value="Airbnb">Airbnb</option>
+                                <option value="Camping">Campsite</option>
+                                <option value="Guest House">Guest House</option>
+                                <option value="Hostel">Hostel</option>
+                                <option value="Hotel">Hotel</option>
+                                <option value="Motel">Motel</option>
+                                <option value="Resort">Resort</option>
+                                <option value="Villa">Villa</option>
+                                <option value="Other">Other</option>
                             </select>
-                        </div>
-                        <div class="row mb-3">
-                            <svg class="temp-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 3c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2s-2-.9-2-2V5c0-1.1.9-2 2-2zM16.5 12c0 2.2-1.8 4-4 4s-4-1.8-4-4c0-2.2 1.8-4 4-4s4 1.8 4 4zM12 17c-1.7 0-3.2-.9-4-2.3V19c0 1.1.9 2 2 2s2-.9 2-2v-4h2v4c0 1.1.9 2 2 2s2-.9 2-2v-4.3c-.8 1.4-2.3 2.3-4 2.3z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                        <label>Temperature:</label>
-                        <input name="temperature" type="number" id="temperature"  step="0.01" required>
-                        </div>
-                        <div class="row mb-3">
-                            <svg class="temp-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 4c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3zM7.88 9.88c-.19-.19-.32-.44-.32-.71 0-.27.13-.52.32-.71.39-.39 1.02-.39 1.41 0L12 11.59l1.41-1.41c.39-.39 1.02-.39 1.41 0 .39.39.39 1.02 0 1.41l-2.59 2.59c-.19.19-.44.32-.71.32s-.52-.13-.71-.32L7.88 10.29c-.39-.39-.39-1.02 0-1.41zM16 10.5c0 .28.22.5.5.5s.5-.22.5-.5-.22-.5-.5-.5-.5.22-.5.5z"/>
-                                <path d="M0 0h24v24H0z" fill="none"/>
-                            </svg>
-                            <label>Humidity: </label>
-                            <input name="humidity" type="number" id="humidity"  step="0.01" required>
                         </div>
                         <script>
                             document.getElementById("month-today").value = new Date().getMonth();
@@ -137,7 +171,7 @@ form {
                 </form>
             </div>
             <div class="col-md-6">
-                <div class="result" align="center">
+                <div class="result" align="left">
                     {% if result %}
                         {% for variable, value in original_input.items() %}
                             <b>{{ variable }}</b> : {{ value }}
@@ -145,6 +179,20 @@ form {
                         <br>
                         <br> Predicted expenditure:
                            <p style="font-size:50px">{{ result }}</p>
+                        {% else %}
+                        <div>
+                        <h4>How to use: </h4>
+                        <ul>
+                            <li>Login or Register</li><br>
+                            <li>Fill in the form and submit</li><br>
+                            <li>Check suggested places from the county chosen</li><br>
+                            <li>Check rating and safety recommendations</li><br>
+                            <li>If suitable, add the place to ToVisit List</li><br>
+                            <li>If you visit the place you can mark it as visited or delete it</li><br>
+                            <li>Leave a rating to encourage other tourists</li><br>
+                            <li>Logout</li>
+                        </ul>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -172,8 +220,10 @@ form {
                         <img src={{place.place_picture}} class="rounded" alt="place-image" />
                     </div>
                     <div class="col-12 col-md-8">
-                        <h3 class="mb-2">{{ place.place_name }} - {% if place.rating %} {{ place.rating }} star rated - {% endif %} {% if place.county.is_safe %} <i class="text-success">SAFE</i> {% else %} <i class="text-danger">Unsafe</i>{% endif %}</h3>
-                        {{place.place_description}}
+                        <h3 class="mb-2">{{ place.place_name }} - {% if place.rating %}
+                                {% for x in range(place.rating)%}⭐{% endfor %}
+                                 {% endif %} {% if place.county.is_safe %} <i class="text-success">SAFE</i> {% else %} <i class="text-danger">Unsafe</i>{% endif %}</h3>
+                        {{ place.place_description }}
                         <i>Go to <a href="{{ place.place_map }}" target="_blank">maps </a></i>
                         <button class="add-to-visit-btn ml-2 btn btn-info" data-place-id="{{ place.id }}">Add ToVisit</button>
                     </div>
@@ -188,7 +238,9 @@ form {
                         <img src={{place.place_picture}} class="rounded" alt="place-image" />
                     </div>
                     <div class="col-12 col-md-8">
-                        <h3 class="mb-2">{{ place.place_name }} - {% if place.rating %} {{ place.rating }} star rated - {% endif %} {% if place.county.is_safe %} <i class="text-success">SAFE</i> {% else %} <i class="text-danger">Unsafe</i>{% endif %}</h3>
+                        <h3 class="mb-2">{{ place.place_name }} - {% if place.rating %}
+                                {% for x in range(place.rating)%}⭐{% endfor %}
+                                 {% endif %} {% if place.county.is_safe %} <i class="text-success">SAFE</i> {% else %} <i class="text-danger">Unsafe</i>{% endif %}</h3>
                         {{ place.place_description }}
                         <i>Go to <a href="{{ place.place_map }}" target="_blank">maps </a></i>
                         <button class="add-to-visit-btn ml-2 btn btn-info" data-place-id="{{ place.id }}">Add ToVisit</button>
@@ -197,8 +249,46 @@ form {
             {% endfor %}
         {% endif %}
     </div>
-    <footer class="bg-secondary text-white text-center p-3 position-relative bottom-0 col-12">
-        @Copyright tourism-kenya, 2023
+    <footer class="footer poo">
+        <div class="container">
+            <div class="row">
+                <div class="col-4 col-sm-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main') }}">Home</a></li>
+                        <li><a href="{{ url_for('visits') }}">Visits</a></li>
+                        <li><a href="{{ url_for('view_news') }}">News</a></li>
+                    </ul>
+                </div>
+                <div class="col-7 col-sm-5">
+                    <h5>Our Address</h5>
+                    <address>
+		              121, Nakuru-Kabarak road<br>
+		              TourWise, Nakuru<br>
+		              KENYA<br>
+		              Tel.: +254 791 440-095<br>
+                      Fax1: +254 757 185-189<br>
+                      Fax2: +254 797 696-485<br>
+		              Email: <a href="mailto:tourwise@gmail.com">tourwise@gmail.com</a>
+		           </address>
+                </div>
+                <div class="col-12 col-sm-4 align-self-center">
+                    <div class="text-center">
+                        <a href="http://google.com/+">Google+</a>
+                        <a href="http://www.facebook.com/profile.php?id=">Facebook</a>
+                        <a href="http://www.linkedin.com/in/">LinkedIn</a>
+                        <a href="http://twitter.com/">Twitter</a>
+                        <a href="http://youtube.com/">YouTube</a>
+                        <a href="mailto:">Mail</a>
+                    </div>
+                </div>
+           </div>
+           <div class="row justify-content-center">
+                <div class="col-auto">
+                    <p>© Copyright 2023 TourWise</p>
+                </div>
+           </div>
+        </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>

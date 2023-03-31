@@ -12,7 +12,8 @@ img {
 }
 
 body {
-    background-color: #F5F5F5;
+    background-color: #F8F1F1;
+    color: #0A0A0A;
 }
 
 .card {
@@ -95,6 +96,11 @@ nav {
     height: 75%;
 }
 
+.predict-form{
+    border-radius: 15px;
+    background-color: #d6bebe;
+}
+
 .form-body {
     width: 75%;
     display: flex;
@@ -107,6 +113,12 @@ nav {
     height: 48px;
     display: flex;
     align-items: center;
+}
+
+.poo {
+    background-color: #ded9d9;
+    margin: 0px auto;
+    padding: 20px 0px;
 }
 
 @media screen and (max-width: 568px) {
