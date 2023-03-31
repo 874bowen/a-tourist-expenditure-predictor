@@ -225,9 +225,10 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password1.data)
+        user.writer_request=form.req_to_be_anchor.data
         db.session.add(user)  # add to db
         db.session.commit()
-        return redirect(url_for('login'))
+        return redirect(url_for('main'))
     return render_template('registration.html', form=form)
 
 

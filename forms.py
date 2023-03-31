@@ -12,13 +12,14 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password1 = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password1')])
+    req_to_be_anchor= BooleanField('Request to be news writer')
     submit = SubmitField('Register')
 
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
     submit_login = SubmitField('Login')
 
 

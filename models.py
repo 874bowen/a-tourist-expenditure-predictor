@@ -46,8 +46,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, index=True)
     password_hash = db.Column(db.String(150))
     joined_at = db.Column(db.DateTime(), default=datetime.utcnow, index=True)
-    is_admin = db.Column(db.Boolean(), default=False)
-    is_anchor = db.Column(db.Boolean(), default=False)
+    is_admin = db.Column(db.Boolean(), default=True)
+    is_anchor = db.Column(db.Boolean(), default=True)
+    writer_request = db.Column(db.Boolean(), default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
