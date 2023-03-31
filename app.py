@@ -1,5 +1,6 @@
 import math
 import os
+from datetime import date
 
 import flask
 import pickle
@@ -14,7 +15,7 @@ from flask_login import LoginManager, login_user, current_user, logout_user, log
 from forms import RegistrationForm, LoginForm, MemoryForm, photos, CountyForm, PlaceForm
 
 # Use pickle to load in the pre-trained model.
-with open(f'model/weather_model_two.pkl', 'rb') as f:
+with open(f'model/expenditure2.pkl', 'rb') as f:
     model = pickle.load(f)
 app = flask.Flask(__name__, template_folder='templates')
 
@@ -85,12 +86,41 @@ def main():
         rainfall = flask.request.form['humidity']
         month = flask.request.form['month-today']
         place = flask.request.form['select_place']
+        age = flask.request.form['age']
+        income = flask.request.form['income']
+        duration = flask.request.form['duration']
+        gender = flask.request.form['select_gender']
+        no_of_people = flask.request.form['no_of_people']
+        accommodation = flask.request.form['select_accommodation']
         print(place.title())
         data = CountiesModel.query.filter_by(county_name=place).first()
         rate = data.change_rate
         months = [0] * 11
+        accommodations = [0] * 8
         suggested_places = PlacesModel.query.filter_by(county_id=data.id)
-        visits = ToVisit.query.filter_by(user_id=current_user.id)
+
+        year = date.today().year
+
+        if accommodation == "Airbnb":
+            accommodations[0] = 1
+        elif accommodation == "Campsite":
+            accommodations[1] = 1
+        elif accommodation == "Guest House":
+            accommodations[2] = 1
+        elif accommodation == "Hostel":
+            accommodations[3] = 1
+        elif accommodation == "Hotel":
+            accommodations[4] = 1
+        elif accommodation == "Motel":
+            accommodations[5] = 1
+        elif accommodation == "Resort":
+            accommodations[6] = 1
+        elif month == 8:
+            months[10] = 1
+        elif month == 9:
+            months[9] = 1
+        elif month == 10:
+            months[8] = 1
 
         if month == 1:
             months[3] = 1
@@ -117,10 +147,15 @@ def main():
         else:
             months = months
 
-        input_variables = pd.DataFrame([[rainfall, temperature, *months]],
+        input_variables = pd.DataFrame([[year, rainfall, temperature, age, income, duration, no_of_people, *months, gender, *accommodations]],
                                        columns=[
+                                           'Year',
                                            'Rainfall - (MM)',
                                            'Temperature - (Celsius)',
+                                           'Age',
+                                           'Income (USD)',
+                                           'Duration of Stay',
+                                           'Num. of People',
                                            'Apr Average',
                                            'Aug Average',
                                            'Dec Average',
@@ -132,6 +167,15 @@ def main():
                                            'Nov Average',
                                            'Oct Average',
                                            'Sep Average',
+                                           'Male',
+                                           'Airbnb',
+                                           'Campsite',
+                                           'Guest House',
+                                           'Hostel',
+                                           'Hotel',
+                                           'Motel',
+                                           'Resort',
+                                           'Villa',
                                        ],
                                        dtype=float)
         prediction = model.predict(input_variables)[0]
@@ -261,7 +305,6 @@ def add_to_visit():
 @app.route('/to-visit', methods=['GET', 'POST'])
 def visits():
     visits = ToVisit.query.filter_by(user_id=current_user.id)
-
     return render_template('visits.html', visits=visits)
 
 
@@ -276,6 +319,7 @@ def rate_task(visit_id, rating):
     print(count, total, total / count)
     place = PlacesModel.query.filter_by(id=visit.place_id).first()
     place.rating = math.ceil(total / count)
+    db.session.commit()
     return jsonify({"success": True})
 
 
