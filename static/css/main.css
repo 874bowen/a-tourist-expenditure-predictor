@@ -87,6 +87,13 @@ nav {
     align-content: center;
     /*margin: 2em;*/
 }
+.button-submit {
+    padding: 0 1em;
+    background-color: #4545c1;
+    color: white;
+    border: none;
+    height: 3em;
+}
 .submit-button {
     padding: 0 1em;
     border-radius: 10px;
@@ -120,7 +127,13 @@ nav {
     margin: 0px auto;
     padding: 20px 0px;
 }
-
+.form-group input{
+    width: 100%;
+    border: 1px solid #b4b3b3;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+}
 @media screen and (max-width: 568px) {
     .logged-in-as {
         display: none;

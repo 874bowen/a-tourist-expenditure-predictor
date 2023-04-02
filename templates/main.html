@@ -1,15 +1,21 @@
 <!doctype html>
 <html>
 <style>
-form {
+.form {
     margin: auto;
     width: 75%;
     padding: 1.5rem;
+}
+form label{
+    display: block;
 }
 .result {
     margin: auto;
     width: 75%;
     border: 1px solid #ccc;
+}
+.form-group {
+    margin-bottom: 1em;
 }
 </style>
 <head>
@@ -71,11 +77,97 @@ form {
             </div>
           </div>
         </div>
-
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
+    Launch demo modal
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form action="{{ url_for('main') }}" method="POST">
+                {#                    <div class="form-body">#}
+                                        <input name="month-today" id="month-today" type="number" value="">
+                                                <div class="form-group">
+                                                <label for="select_place">Choose County to Visit</label>
+                                                <select name="select_place" class="form-select" id="select_place">
+                                                    <option value="">--choose county--</option>
+                                                    {% if all_counties %}
+                                                        {% for county in all_counties %}
+                                                            <option value="{{ county.county_name }}">{{ county.county_name }}</option>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="age">Your Age</label>
+                                                    <input placeholder="age" name="age" type="number" id="age" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="temperature">Temperature in the Area</label>
+                                                    <input name="temperature" type="number" id="temperature"  step="0.01" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Please Enter Your Income in Ksh:</label>
+                                                    <input name="income" type="number" id="income" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Humidity in the Area </label>
+                                                    <input name="humidity" type="number" id="humidity"  step="0.01" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>How long do you plan to stay?(in days)</label>
+                                                    <input name="duration" type="number" id="duration"  required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Gender</label>
+                                                    <select name="select_gender" class="form-select" id="select_gender">
+                                                        <option value="">--Gender--</option>
+                                                        <option value="1">Male</option>
+                                                        <option value="0">Female</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>How many people will accompany you?</label>
+                                                    <input name="no_of_people" type="number" id="no_of_people" required>
+                                                </div>
+                                                <div class="form-group">
+                                                <label for="select_accommodation">Preferred Type of Accomodation</label>
+                                                <select name="select_accommodation" class="form-select" id="select_accommodation">
+                                                <option value="">--Type of Desired Accommodation--</option>
+                                                <option value="Airbnb">Airbnb</option>
+                                                <option value="Camping">Campsite</option>
+                                                <option value="Guest House">Guest House</option>
+                                                <option value="Hostel">Hostel</option>
+                                                <option value="Hotel">Hotel</option>
+                                                <option value="Motel">Motel</option>
+                                                <option value="Resort">Resort</option>
+                                                <option value="Villa">Villa</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            </div>
+                                        </div>
+                                        
+                                            <input class="button-submit" type="submit">
+                {#                    </div>#}
+                                </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
     <div class="container mt-10">
         <div class="row">
             <div class="col-md-6">
-                <form action="{{ url_for('main') }}" class="predict-form mb-2" method="POST">
+                <!-- <form action="{{ url_for('main') }}" class="predict-form mb-2" method="POST">
 {#                    <div class="form-body">#}
                         <input name="month-today" id="month-today" type="number" value="">
                         <div class="row mb-3">
@@ -141,34 +233,12 @@ form {
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <script>
-                            document.getElementById("month-today").value = new Date().getMonth();
-                            const humidity = document.getElementById(('humidity'))
-                            const temperature = document.getElementById('temperature');
-                            const selectPlace = document.getElementById('select_place');
-
-                            selectPlace.addEventListener('change', () => {
-                                var place=document.getElementById('select_place').value;
-                                checkWeather(place)
-                            })
-                            let currWeather;
-                            const checkWeather = async (place, callback) => {
-                                let weatherData  = await fetch(`https://api.weatherapi.com/v1/current.json?key=be14007191cf4192b20110252231002&q=${place}&aqi=no`)
-                                let weatherDataJson = await weatherData.json();
-                                currWeather = weatherDataJson;
-                                humidity.value = weatherDataJson.current.humidity;
-                                temperature.value = weatherDataJson.current.feelslike_c;
-                                console.log(weatherDataJson.current)
-                                return weatherDataJson;
-                            }
-                            console.log(currWeather)
-
-                        </script>
+                        
                         <div  class="form-item">
                             <input class="submit-button" type="submit">
                         </div>
 {#                    </div>#}
-                </form>
+                </form> -->
             </div>
             <div class="col-md-6">
                 <div class="result" align="left">
@@ -290,6 +360,29 @@ form {
            </div>
         </div>
     </footer>
+    <script>
+        document.getElementById("month-today").value = new Date().getMonth();
+        const humidity = document.getElementById(('humidity'))
+        const temperature = document.getElementById('temperature');
+        const selectPlace = document.getElementById('select_place');
+
+        selectPlace.addEventListener('change', () => {
+            var place=document.getElementById('select_place').value;
+            checkWeather(place)
+        })
+        let currWeather;
+        const checkWeather = async (place, callback) => {
+            let weatherData  = await fetch(`https://api.weatherapi.com/v1/current.json?key=be14007191cf4192b20110252231002&q=${place}&aqi=no`)
+            let weatherDataJson = await weatherData.json();
+            currWeather = weatherDataJson;
+            humidity.value = weatherDataJson.current.humidity;
+            temperature.value = weatherDataJson.current.feelslike_c;
+            console.log(weatherDataJson.current)
+            return weatherDataJson;
+        }
+        console.log(currWeather)
+
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
         // Get the loading text element
