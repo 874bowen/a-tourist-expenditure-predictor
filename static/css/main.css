@@ -1,14 +1,21 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Poppins:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&family=Poppins:wght@600&display=swap');
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    font-family: Lato;
 }
 
 img {
     display: block;
     max-width: 100%;
     height: auto;
+}
+
+hr {
+    margin: 0;
+    border: 0;
 }
 
 body {
@@ -53,13 +60,17 @@ nav {
     align-items: center;
     justify-content: space-between;
     padding: 1em;
-    background-color: #ebe3e3;
     border-radius: 10px;
     margin: 1vw;
 }
+.navbar {
+    padding-top: 0;
+    padding-bottom: 0%;
+}
 .home {
-    width: 100%;
+    width: auto;
     text-decoration: none;
+    color: #0A0A0A;
 }
 
 .current_user {
@@ -139,3 +150,55 @@ nav {
         display: none;
     }
 }
+
+.headline {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+}
+
+.welcome-area{
+    background-color: #fda92c;
+    color: #1f0f4f;
+    width: 65%;
+    display: flex;
+    justify-content: center;
+}
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80%;
+}
+.welcome-message {
+    font-size: 54px;
+    line-height: 60px;
+    font-weight: 600;
+}
+.how-it-works {
+    font-size: 34px;
+    line-height: 60px;
+    font-weight: 500;
+    background-image: url('noun.svg');
+}
+.welcome-description {
+    margin: 40px 0 0;
+    padding-bottom: 40px;
+}
+.welcome-description-text {
+    font-size: 32px;
+    line-height: 36px;
+    font-weight: 600;
+    margin-bottom: 1em;
+}
+.open {
+    width: 250px;
+    height: 60px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+    background: #1f0f4f !important;
+    color: #fff !important;
+}
+
